@@ -3,6 +3,7 @@ package com.garytin.Springboot.tutorial.controller;
 import com.garytin.Springboot.tutorial.entity.Department;
 import com.garytin.Springboot.tutorial.service.DepartmentService;
 import com.garytin.Springboot.tutorial.service.DepartmentServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping("/")
-    public ResponseEntity<Department> saveDepartment(@RequestBody Department department) {
+    public ResponseEntity<Department> saveDepartment(@Valid @RequestBody Department department) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(department.getDepartmentId()).toUri();
         return ResponseEntity.created(location).body(departmentService.saveDepartment(department));
@@ -28,7 +29,7 @@ public class DepartmentController {
     }
 
     @PostMapping("/saveAll")
-    public ResponseEntity<List<Department>> saveAllDepartments(@RequestBody List<Department> departments) {
+    public ResponseEntity<List<Department>> saveAllDepartments(@Valid @RequestBody List<Department> departments) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(departments.get(0).getDepartmentId()).toUri();
         return ResponseEntity.created(location).body(departmentService.saveAllDepartments(departments));
