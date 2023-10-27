@@ -1,6 +1,7 @@
 package com.garytin.Springboot.tutorial.service;
 
 import com.garytin.Springboot.tutorial.entity.Department;
+import com.garytin.Springboot.tutorial.error.DepartmentNotFoundException;
 import com.garytin.Springboot.tutorial.repository.DepartmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,22 +32,27 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
-    public Optional<Department> getDepartmentById(Long departmentId) {
-        return departmentRepository.findById(departmentId);
+    public Department getDepartmentById(Long departmentId) throws DepartmentNotFoundException {
+        Optional<Department> department = departmentRepository.findById(departmentId);
+        if (department.isEmpty())
+        {
+            throw new DepartmentNotFoundException(String.format("Department with {ID:%d} is not available", departmentId));
+        }
+        return department.get();
     }
 
     @Override
-    public boolean deleteDepartmentById(Long departmentId) {
+    public void deleteDepartmentById(Long departmentId) throws DepartmentNotFoundException {
         if (departmentRepository.findById(departmentId).isPresent())
         {
             departmentRepository.deleteById(departmentId);
-            return true;
+            return;
         }
-        return false;
+        throw new DepartmentNotFoundException(String.format("Department with {ID:%d} is not available", departmentId));
     }
 
     @Override
-    public Optional<Department> updateDepartmentById(Long departmentId, Department department) {
+    public Department updateDepartmentById(Long departmentId, Department department) throws DepartmentNotFoundException {
         Optional<Department> departmentOptional = departmentRepository.findById(departmentId);
         if (departmentOptional.isPresent())
         {
@@ -64,13 +70,18 @@ public class DepartmentServiceImpl implements DepartmentService {
                 department1.setDepartmentCode(department.getDepartmentCode());
             }
             departmentRepository.save(department1);
-            return Optional.of(department1);
+            return department1;
         }
-        return Optional.empty();
+        throw new DepartmentNotFoundException(String.format("Department with {ID:%d} is not available", departmentId));
     }
 
     @Override
-    public Optional<Department> getDepartmentByName(String departmentName) {
-        return departmentRepository.findByDepartmentNameIgnoreCase(departmentName);
+    public Department getDepartmentByName(String departmentName) throws DepartmentNotFoundException {
+        Optional<Department> department = departmentRepository.findByDepartmentNameIgnoreCase(departmentName);
+        if (department.isEmpty())
+        {
+            throw new DepartmentNotFoundException(String.format("Department with {Name:%s} is not available", departmentName));
+        }
+        return department.get();
     }
 }
